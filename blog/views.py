@@ -9,6 +9,7 @@ from .serializers import (
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.views import APIView
 
 
 class ArticleViewSet(viewsets.ModelViewSet):
@@ -76,3 +77,23 @@ class AbonneNewsletterViewSet(viewsets.ModelViewSet):
     queryset = AbonneNewsletter.objects.all()
     serializer_class = AbonneNewsletterSerializer
     permission_classes = [AllowAny]
+
+
+class AdminDashboardStatsView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        articles_publies = Article.objects.filter(
+            statut='publie'
+        ).count()
+
+        commentaires = Commentaire.objects.count()
+
+        categories = Categorie.objects.count()
+
+        return Response({
+            'articles_publies': articles_publies,
+            'commentaires': commentaires,
+            'categories': categories,
+        })
+
